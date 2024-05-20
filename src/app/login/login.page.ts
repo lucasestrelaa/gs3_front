@@ -1,5 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -7,30 +9,32 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-  // public formLogin: FormGroup;
   public email: string = '';
   public password: string = '';
+  private apiUrl: string = 'http://localhost:3001';
   constructor(
-    // private formBuilder: FormBuilder
-
-  ) { 
-    // this.formLogin = this.formBuilder.group({
-		// 	'email': [null, Validators.compose([Validators.required,Validators.pattern('^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$')])],
-		// 	'password': [null, Validators.compose([Validators.required, Validators.minLength(3)])]
-		// });
+    private router: Router,
+    public http: HttpClient
+  ) {
+    
   }
 
-  ngOnInit() {
-  }
-  autenticacao = false
+  ngOnInit() {}
+  autenticacao = false;
   login() {
-    alert("Teste email: "+this.email+" senha: "+this.password)
+    alert('Teste email: ' + this.email + ' senha: ' + this.password);
+    var usuario = { email: this.email, password: this.password };
+    //this.http.post(`${this.apiUrl}/usuario`, usuario).subscribe(
+      //(res) => {
+        this.router.navigate(['/folder/home'])
+      //},
+      //(erro) => {
+      //  if (erro.status == 400) {
+     //     console.log(erro);
+     //   }
+      //}
+   // );
   }
-  cadastrar(){
-
-  }
-  logout(){
-
-  }
-
+  cadastrar() {}
+  logout() {}
 }

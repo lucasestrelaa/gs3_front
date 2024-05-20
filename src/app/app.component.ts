@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
 export class AppComponent {
   public appPages = [
     { title: 'Home', url: '/folder/home', icon: 'home' },
-    { title: 'Perfil', url: '/folder/outbox', icon: 'person' },
+    { title: 'Perfil', url: '/folder/perfil', icon: 'person' },
+    { title: 'Adm', url: '/folder/administracao', icon: 'build' },
   ];
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
   public user = "teste"
