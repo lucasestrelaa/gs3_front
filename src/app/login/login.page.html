@@ -21,6 +21,11 @@
       </ion-list>
     </ion-list>
     <ion-button expand="full" shape="round" (click)="login()">Enviar</ion-button>
+    <ion-list *ngIf="erro">
+      <ion-item>
+        Login Inválido!
+      </ion-item>
+    </ion-list>
   </ion-card>
   </div>
 </ion-content>

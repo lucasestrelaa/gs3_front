@@ -16,8 +16,8 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {}
   autenticacao = false;
+  erro = false
   login() {
-    alert('Teste email: ' + this.email + ' senha: ' + this.password);
     var usuario = { login: this.email, password: this.password };
     this.http.post(`${this.apiUrl}login`, usuario).subscribe(
       
@@ -29,9 +29,11 @@ export class LoginPage implements OnInit {
         sessionStorage.setItem('token', array[2])
         this.router.navigate(['/folder/home']);
       },
-      (erro) => {
-        if (erro.status == 404) {
-          console.log(erro);
+      (err) => {
+        this.erro = true
+        if (err.status == 404) {
+          
+          console.log(err);
         }
       }
     );
