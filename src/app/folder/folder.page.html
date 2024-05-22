@@ -1,68 +1,125 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>{{ folder }}</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-app>
+  <ion-split-pane contentId="main-content">
+    <ion-menu
+      contentId="main-content"
+      type="overlay"
+      *ngIf="router.url !== '/login'"
+    >
+      <ion-content>
+        <ion-list id="inbox-list">
+          <ion-list-header>GS3</ion-list-header>
+          <ion-note>hi&#64;{{ user }}</ion-note>
 
-<ion-content [fullscreen]="true">
-  <div id="container" *ngIf="router.url === '/folder/home'">
-    <div>
-      <strong class="capitalize">Informações sobre a GS3</strong>
-      
-    </div>
-  </div>
+          <ion-menu-toggle
+            auto-hide="false"
+            *ngFor="let p of appPages; let i = index"
+          >
+            <ion-item
+              routerDirection="root"
+              [routerLink]="[p.url]"
+              lines="none"
+              detail="false"
+              routerLinkActive="selected"
+              *ngIf="p.permission == true"
+            >
+              <ion-icon
+                aria-hidden="true"
+                slot="start"
+                [ios]="p.icon + '-outline'"
+                [md]="p.icon + '-sharp'"
+              ></ion-icon>
+              <ion-label>{{ p.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+    <ion-content [fullscreen]="true">
+      <ion-header [translucent]="true">
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+          </ion-buttons>
+          <ion-title>{{ folder }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <div id="container" *ngIf="router.url === '/folder/home'">
+        <div>
+          <strong class="capitalize">Informações sobre a GS3</strong>
+        </div>
+      </div>
+      <ion-list *ngIf="router.url === '/folder/perfil'">
+        <ion-list>
+          <ion-item>
+            <ion-input label="Text input" placeholder="Enter text"></ion-input>
+          </ion-item>
 
-    <ion-list *ngIf="router.url === '/folder/perfil'">
-      <ion-list>
-        <ion-item>
-          <ion-input label="Text input" placeholder="Enter text"></ion-input>
-        </ion-item>
+          <ion-item>
+            <ion-input
+              label="Telefone"
+              type="number"
+              placeholder="(99) 99999-9999"
+            ></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-input
-            label="Telefone"
-            type="number"
-            placeholder="(99) 99999-9999"
-          ></ion-input>
-        </ion-item>
+          <ion-item>
+            <ion-input
+              label="Senha"
+              type="password"
+              value="password"
+            ></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-input
-            label="Senha"
-            type="password"
-            value="password"
-          ></ion-input>
-        </ion-item>
+          <ion-item>
+            <ion-input
+              label="E-mail"
+              type="email"
+              placeholder="email@domain.com"
+            ></ion-input>
+          </ion-item>
 
-        <ion-item>
-          <ion-input
-            label="E-mail"
-            type="email"
-            placeholder="email@domain.com"
-          ></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-input
-            label="Telephone"
-            type="tel"
-            placeholder="(99) 9999-9999"
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-button (click)="updateProfile()">Enviar</ion-button>
-        </ion-item>
+          <ion-item>
+            <ion-input
+              label="Telephone"
+              type="tel"
+              placeholder="(99) 9999-9999"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-button (click)="updateProfile()">Enviar</ion-button>
+          </ion-item>
+        </ion-list>
       </ion-list>
-    </ion-list>
 
-  <ion-list *ngIf="router.url === '/folder/administracao'">
-    <ion-list>
-      <ion-item *ngFor="let user of users">
-        <ion-label >{{user.nome}}</ion-label>
-      </ion-item>
-    </ion-list>
-  </ion-list>
-</ion-content>
+      <ion-list *ngIf="router.url === '/folder/administracao'">
+        <ion-list>
+          <ion-item *ngFor="let user of users">
+            <ion-label>
+              <ion-grid>
+                <ion-row>
+                  <ion-col>{{user.nome}}</ion-col>
+                  <ion-col size="auto">
+                    <div style="width: 180px">
+                      <ion-item>
+                        <ion-select
+                          placeholder="Selecione"
+                          value="{{user.profile_id}}"
+                        >
+                          <ion-select-option
+                            *ngFor="let item of profiles"
+                            value="{{item.id}}"
+                            >{{item.name}}</ion-select-option
+                          >
+                        </ion-select>
+                      </ion-item>
+                    </div>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-list>
+    </ion-content>
+  </ion-split-pane>
+</ion-app>
