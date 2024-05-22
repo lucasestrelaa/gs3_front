@@ -26,7 +26,8 @@ export class LoginPage implements OnInit {
         const array = Object.entries(res).map(([chave, valor]) => valor);
         console.log(array[2]); 
 
-        sessionStorage.setItem('token', array[2])
+        sessionStorage.setItem('profile_id', array[2])
+        sessionStorage.setItem('token', array[3])
         this.router.navigate(['/folder/home']);
       },
       (err) => {

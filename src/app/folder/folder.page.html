@@ -10,16 +10,8 @@
 <ion-content [fullscreen]="true">
   <div id="container" *ngIf="router.url === '/folder/home'">
     <div>
-      <strong class="capitalize">{{ folder }} - teste</strong>
-      <p>
-        Explore
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://ionicframework.com/docs/components"
-          >UI Components</a
-        >
-      </p>
+      <strong class="capitalize">Informações sobre a GS3</strong>
+      
     </div>
   </div>
 
@@ -31,15 +23,15 @@
 
         <ion-item>
           <ion-input
-            label="Number input"
+            label="Telefone"
             type="number"
-            placeholder="000"
+            placeholder="(99) 99999-9999"
           ></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-input
-            label="Password input"
+            label="Senha"
             type="password"
             value="password"
           ></ion-input>
@@ -47,7 +39,7 @@
 
         <ion-item>
           <ion-input
-            label="Email input"
+            label="E-mail"
             type="email"
             placeholder="email@domain.com"
           ></ion-input>
@@ -55,26 +47,22 @@
 
         <ion-item>
           <ion-input
-            label="Telephone input"
+            label="Telephone"
             type="tel"
-            placeholder="888-888-8888"
+            placeholder="(99) 9999-9999"
           ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-button (click)="updateProfile()">Enviar</ion-button>
         </ion-item>
       </ion-list>
     </ion-list>
 
-  <div id="container" *ngIf="router.url === '/folder/administracao'">
-    <div>
-      <strong class="capitalize">{{ folder }} - teste</strong>
-      <p>
-        Explore
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://ionicframework.com/docs/components"
-          >UI Components</a
-        >
-      </p>
-    </div>
-  </div>
+  <ion-list *ngIf="router.url === '/folder/administracao'">
+    <ion-list>
+      <ion-item *ngFor="let user of users">
+        <ion-label >{{user.nome}}</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-list>
 </ion-content>
