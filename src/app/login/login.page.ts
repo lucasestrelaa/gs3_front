@@ -11,10 +11,17 @@ import { Router } from '@angular/router';
 export class LoginPage implements OnInit {
   public email: string = '';
   public password: string = '';
-  private apiUrl: string = 'http://127.0.0.1:8000/api/';
+  url = window.location.hostname
+  private apiUrl: string = this.url.includes('localhost') ? 'http://localhost:8000/api/' :
+  'https://desafiogs3.addictiontech.com.br/public/api/'
+
   constructor(private router: Router, public http: HttpClient) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.url)
+    console.log(this.apiUrl);
+    
+  }
   autenticacao = false;
   erro = false
   login() {
@@ -24,10 +31,11 @@ export class LoginPage implements OnInit {
       (res) => {
         console.log("logou")
         const array = Object.entries(res).map(([chave, valor]) => valor);
-        console.log(array[2]); 
+        console.log(array); 
 
         sessionStorage.setItem('profile_id', array[2])
         sessionStorage.setItem('token', array[3])
+        sessionStorage.setItem('user_id', array[4])
         this.router.navigate(['/folder/home']);
       },
       (err) => {

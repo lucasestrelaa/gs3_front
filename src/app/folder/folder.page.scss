@@ -26,8 +26,17 @@ ion-menu-button {
 #container a {
   text-decoration: none;
 }
+// @media screen and (max-width: 787px) {
+//   ion-menu{
+//     z-index: inherit !important;
+//   }
+// }
 ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
+}
+
+.menu-enabled {
+  z-index: 20;
 }
 
 ion-menu.md ion-content {

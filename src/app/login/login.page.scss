@@ -12,3 +12,8 @@
 ion-button{
     width: 75%;
 }
+@media only screen and (max-width: 787px) {
+    .card{
+        width: 100%;
+    }
+}

@@ -16,7 +16,5 @@ export class AppComponent {
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
   public user = "teste"
   constructor(public router: Router) {
-    console.log(this.appPages)
-    console.log(this.profile_id)
   }
 }

@@ -8,7 +8,7 @@
       <ion-content>
         <ion-list id="inbox-list">
           <ion-list-header>GS3</ion-list-header>
-          <ion-note>hi&#64;{{ user }}</ion-note>
+          <ion-note>hi&#64;{{ user.nome }}</ion-note>
 
           <ion-menu-toggle
             auto-hide="false"
@@ -49,77 +49,69 @@
         </div>
       </div>
       <ion-list *ngIf="router.url === '/folder/perfil'">
-        <ion-list>
-          <ion-item>
-            <ion-input label="Text input" placeholder="Enter text"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-input
-              label="Telefone"
-              type="number"
-              placeholder="(99) 99999-9999"
-            ></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-input
-              label="Senha"
-              type="password"
-              value="password"
-            ></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-input
-              label="E-mail"
-              type="email"
-              placeholder="email@domain.com"
-            ></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-input
-              label="Telephone"
-              type="tel"
-              placeholder="(99) 9999-9999"
-            ></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-button (click)="updateProfile()">Enviar</ion-button>
-          </ion-item>
-        </ion-list>
+          <ion-list>
+            <ion-item>
+              <ion-input
+                label="Nome"
+                placeholder="Digite seu nome"
+                value="{{user.nome}}"
+                [(ngModel)] = "nomeUsuario"
+              >
+              </ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input
+                label="E-mail"
+                type="email"
+                value="{{user.email}}"
+                placeholder="email@domain.com"
+                [(ngModel)] = "emailUsuario"
+              ></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-button (click)="updateProfile()">Enviar</ion-button>
+            </ion-item>
+          </ion-list>
       </ion-list>
 
-      <ion-list *ngIf="router.url === '/folder/administracao'">
+      <div *ngIf="router.url === '/folder/administracao'">
         <ion-list>
-          <ion-item *ngFor="let user of users">
-            <ion-label>
-              <ion-grid>
-                <ion-row>
-                  <ion-col>{{user.nome}}</ion-col>
-                  <ion-col size="auto">
-                    <div style="width: 180px">
-                      <ion-item>
-                        <ion-select
-                          placeholder="Selecione"
-                          value="{{user.profile_id}}"
-                        >
-                          <ion-select-option
-                            *ngFor="let item of profiles"
-                            value="{{item.id}}"
-                            >{{item.name}}</ion-select-option
+          <ion-list>
+            <ion-item *ngFor="let user of users">
+              <ion-label>
+                <ion-grid>
+                  <ion-row>
+                    <ion-col>{{user.nome}}</ion-col>
+                    <ion-col size="auto">
+                      <div style="width: 180px">
+                        <ion-item>
+                          <ion-select
+                            placeholder="Selecione"
+                            value="{{user.profile_id}}"
+                            name="{{user.profile_id}}"
+                            (ionChange)="updateProfileUser($event.target.value)"
                           >
-                        </ion-select>
-                      </ion-item>
-                    </div>
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-            </ion-label>
-          </ion-item>
+                            <ion-select-option
+                              *ngFor="let item of profiles"
+                              value="{{item.id}}"
+                              >{{item.name}}</ion-select-option
+                            >
+                          </ion-select>
+                        </ion-item>
+                      </div>
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-label>
+            </ion-item>
+          </ion-list>
         </ion-list>
-      </ion-list>
+        <ion-fab horizontal="end" vertical="bottom" slot="fixed">
+          <ion-fab-button>
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
     </ion-content>
   </ion-split-pane>
 </ion-app>
