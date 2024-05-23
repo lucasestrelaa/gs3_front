@@ -7,7 +7,7 @@
 }
 .card{
     width: 35%;
-    padding: 20px;
+    padding: 20px 0px;
 }
 ion-button{
     width: 75%;
@@ -16,4 +16,7 @@ ion-button{
     .card{
         width: 100%;
     }
+}
+ion-card{
+    padding: 20px 0px;
 }

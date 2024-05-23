@@ -145,11 +145,11 @@ export class FolderPage implements OnInit {
     //se o valor for igual ao original, não fazer nada
     //diferente, atualiza usuário e redireciona para folder/perfil
     if(
-      (this.nomeUsuario == '' || this.emailUsuario == '') ||
-      (this.nomeUsuario == this.user.nome ||  this.emailUsuario == this.user.email)
+      (this.nomeUsuario != '' || this.emailUsuario != '') ||
+      (this.nomeUsuario != this.user.nome ||  this.emailUsuario != this.user.email)
     ){
-      
-    }
+
+    } console.log('revisar o update do cliente')
   }
   updateProfileUser(event: any) {
     console.log('update Profile User:' + event);
