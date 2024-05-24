@@ -99,12 +99,14 @@
                             placeholder="Selecione"
                             value="{{userProfile.profile_id}}"
                             name="{{userProfile.profile_id}}"
-                            (ionChange)="updateProfileUser($event.target.value)"
+                            (ionChange)="updateProfileUser(userProfile.id, $event.target.value)"
                           >
                             <ion-select-option
                               *ngFor="let item of profiles"
                               value="{{item.id}}"
-                              >{{item.name}}</ion-select-option
+                              >
+                              {{item.name}}
+                              </ion-select-option
                             >
                           </ion-select>
                         </ion-item>

@@ -63,7 +63,6 @@ export class FolderPage implements OnInit {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
       this.getProfiles();
   }
-
   submit(){
     //rota = perfil
     if(this.router.url === '/folder/perfil'){
@@ -75,7 +74,6 @@ export class FolderPage implements OnInit {
       console.log('rota de user')
     }
   }
-
   getProfiles() {
     this.http.get(`${this.apiUrl}profile`, { responseType: 'text' }).subscribe(
       (res) => {
@@ -97,7 +95,6 @@ export class FolderPage implements OnInit {
       }
     );
   }
-
   getUsers() {
     let dataGrid: any = [];
     let data = {
@@ -169,9 +166,7 @@ export class FolderPage implements OnInit {
     console.log(data)
     this.http.post(`${this.apiUrl}users`, data).subscribe(
       (res) => {
-
         const array = Object.entries(res).map(([chave, valor]) => valor);
-        console.log(array)
         this.showLoading(array[1])
         this.getProfiles()
         setTimeout(() => {
@@ -186,26 +181,74 @@ export class FolderPage implements OnInit {
       }
     );
   }
-
   updateProfile() {
-    console.log(this.nomeUsuario + " - "+ this.emailUsuario)
-    //se não tiver valor - não mudou enão não faz nada
-    //se o valor for igual ao original, não fazer nada
-    //diferente, atualiza usuário e redireciona para folder/perfil
-    if(
-      (this.nomeUsuario != '' || this.emailUsuario != '') ||
-      (this.nomeUsuario != this.user.nome ||  this.emailUsuario != this.user.email)
-    ){
+    let update = false;
+    if(this.nomeUsuario == ''){
+      this.nomeUsuario = this.user.nome
+    }else{
+      update = true
+    }
 
-    } console.log('revisar o update do cliente')
+    if(this.emailUsuario == ''){
+      this.emailUsuario = this.user.nome
+    }else{
+      update = true
+    }
+    
+    if(update){
+      let data = {
+        token: this.token,
+        user_id: this.user_id,
+        profile_id: this.profile_id,
+        name: this.nomeUsuario,
+        email: this.emailUsuario,
+      }
+      this.http.put(`${this.apiUrl}users`, data).subscribe(
+        (res) => {
+          const array = Object.entries(res).map(([chave, valor]) => valor);
+          this.showLoading(array[1])
+          this.getProfiles()
+          setTimeout(() => {
+            this.router.navigate(['/folder/home']);
+          }, 4000);
+        },
+        (err) => {
+          this.erro = true
+          if (err.status == 404) {
+            console.log(err);
+          }
+        }
+      );
+    }else{
+      let message = 'Não foram realizadas mudanças!'
+      this.showLoading(message)
+    }
   }
-  updateProfileUser(event: any) {
-    console.log('update Profile User:' + event);
-    //se não tiver valor - não mudou enão não faz nada
-    //se o valor for igual ao original, não fazer nada
-    //diferente, atualiza usuário e redireciona para folder/administrador
+  updateProfileUser(id: any, event: any) {
+    console.log('update Profile User:'+id+" - " + event);
+    let data = {
+      profile_id: this.profile_id,
+      token: this.token,
+      user_id: id,
+      profile_id_new: event
+    }
+    this.http.put(`${this.apiUrl}updateProfileUser`, data).subscribe(
+      (res) => {
+        const array = Object.entries(res).map(([chave, valor]) => valor);
+        this.showLoading(array[1])
+        this.getProfiles()
+        setTimeout(() => {
+          this.router.navigate(['/folder/home']);
+        }, 4000);
+      },
+      (err) => {
+        this.erro = true
+        if (err.status == 404) {
+          console.log(err);
+        }
+      }
+    );
   }
-
   deleteUser(id: any){
     let data = {
       delete_user_id: id,
@@ -213,16 +256,13 @@ export class FolderPage implements OnInit {
       user_id: this.user_id,
       profile_id: this.profile_id
     }
-    console.log('deletou o usuário '+id)
     this.http
-      .delete(`${this.apiUrl}users`)
+      .delete(`${this.apiUrl}users/${this.profile_id}/${id}`)
       .subscribe(
         async (res) => {
           let data = res;
           const array = Object.entries(res).map(([chave, valor]) => valor);
-          console.log(array)
-          console.log(data)
-          await this.showLoading(array[0].message)
+          await this.showLoading(array[1])
         },
         async (err) => {
           this.erro = true;
