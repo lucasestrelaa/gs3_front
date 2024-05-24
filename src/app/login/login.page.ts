@@ -29,13 +29,14 @@ export class LoginPage implements OnInit {
     this.http.post(`${this.apiUrl}login`, usuario).subscribe(
       
       (res) => {
-        console.log("logou")
         const array = Object.entries(res).map(([chave, valor]) => valor);
-        console.log(array); 
-
+        var data = new Date(),
+        minutos = 3;
+        data.setMinutes(data.getMinutes() + minutos);
         sessionStorage.setItem('profile_id', array[2])
         sessionStorage.setItem('token', array[3])
         sessionStorage.setItem('user_id', array[4])
+        sessionStorage.setItem('login_realizado', data.toString())
         this.router.navigate(['/folder/home']);
       },
       (err) => {

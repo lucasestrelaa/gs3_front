@@ -1,6 +1,9 @@
 ion-menu-button {
   color: var(--ion-color-primary);
 }
+.menu-content-open{
+  pointer-events: inherit !important;
+}
 
 #container {
   text-align: center;
@@ -153,4 +156,16 @@ ion-note {
 
 ion-item.selected {
   --color: var(--ion-color-primary);
+}
+.container-home{
+  padding: 10px;
+}
+.grid-container {
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+}
+.div-elements{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

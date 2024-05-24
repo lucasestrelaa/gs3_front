@@ -12,10 +12,12 @@ import { LoadingController } from '@ionic/angular';
 export class FolderPage implements OnInit {
   public folder!: string;
 
-  public nomeUsuario: string = '';
-  public emailUsuario: string = '';
-  public passwordUsuario: string = '';
-  private activatedRoute = inject(ActivatedRoute);
+  public nomeUsuario: string = ''
+  public emailUsuario: string = ''
+  public profileName: string = ''
+  public profileDescription: string = ''
+  public passwordUsuario: string = ''
+  private activatedRoute = inject(ActivatedRoute)
   users: any;
   user = {
     id: 0,
@@ -24,12 +26,17 @@ export class FolderPage implements OnInit {
     profile_id: 0,
     profile_name: ''
   };
+  profile = {
+    id: 0,
+    nome: '',
+    description: ''
+  };
   profiles: any;
   url = window.location.hostname
   private apiUrl: string = this.url.includes('localhost') ? 'http://localhost:8000/api/' :
-  'https://desafiogs3.addictiontech.com.br/public/api/';
+  'https://desafiogs3.addictiontech.com.br/public/api/'
   private erro = false;
-  private profile_id = sessionStorage.getItem('profile_id');
+  private profile_id = sessionStorage.getItem('profile_id')
   user_id = sessionStorage.getItem('user_id')
   token = sessionStorage.getItem('token')
 
@@ -55,24 +62,71 @@ export class FolderPage implements OnInit {
       icon: 'build',
       permission: this.profile_id == '1' ? true : false,
     },
+    {
+      title: 'Novo Usuario',
+      url: '/folder/newUser',
+      icon: 'build',
+      permission: false,
+    },
+    {
+      title: 'perfis',
+      url: '/folder/profiles',
+      icon: 'build',
+      permission: this.profile_id == '1' ? true : false,
+    },
   ];
 
-  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
+  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
       this.getProfiles();
+      /*
+        implementação futura - 
+        pegar hora do session e comparar com a hora atual, 
+        se for maior que 15 minutos, buscar token na api, 
+        comparar horas e deslogar 
+      */
   }
   submit(){
     //rota = perfil
     if(this.router.url === '/folder/perfil'){
-      this.updateProfile()
+      this.updateUser()
       console.log('rota de perfil')
     }else{
       //rota = newUser
-      this.newUser()
-      console.log('rota de user')
+      if(
+        this.nomeUsuario == "" || 
+        this.emailUsuario == "" ||
+        this.passwordUsuario == ""
+      ){
+        this.showLoading("Confira os campos e tente novamente!")
+      }else{
+        this.newUser()
+      }
     }
+  }
+  logout(){
+    let data = {
+      token: this.token
+    }
+    this.http.post(`${this.apiUrl}logout`, data).subscribe(
+      (res) => {
+        const array = Object.entries(res).map(([chave, valor]) => valor);
+        this.showLoading(array[1])
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 4000);
+      },
+      (err) => {
+        this.erro = true
+        if (err.status == 404) {
+          console.log(err);
+        }
+      }
+    );
+    //sessionStorage.clear()
+    //console.log('usuário deslogado!')
   }
   getProfiles() {
     this.http.get(`${this.apiUrl}profile`, { responseType: 'text' }).subscribe(
@@ -95,6 +149,112 @@ export class FolderPage implements OnInit {
       }
     );
   }
+  getProfile(profile_select_id: any){
+    let dataGrid: any = [];
+    this.http
+      .get(`${this.apiUrl}profile/${this.token}/${profile_select_id}`)
+      .subscribe(
+        (res) => {
+          let data = res;
+          const array = Object.entries(res).map(([chave, valor]) => valor);
+          
+          this.profile = array[1]
+        },
+        (err) => {
+          this.erro = true;
+          console.log(err);
+          if (err.status == 404) {
+            console.log(err);
+          }
+        }
+      );
+  }
+  newProfile(){
+    let data = {
+      token: this.token,
+      user_id: this.user_id,
+      name: this.profileName,
+      description: this.profileDescription,
+    }
+    console.log(data)
+    this.http.post(`${this.apiUrl}profile`, data).subscribe(
+      (res) => {
+        const array = Object.entries(res).map(([chave, valor]) => valor);
+        this.showLoading(array[1])
+        this.getProfiles()
+        setTimeout(() => {
+          this.router.navigate(['/folder/administracao']);
+        }, 4000);
+      },
+      (err) => {
+        this.erro = true
+        console.log("error")
+        this.showLoading(err.error)
+        if (err.status == 404) {
+          console.log(err);
+        }
+      }
+    );
+  }
+  updateProfile(){
+    let update = false;
+    if(this.profileName == ''){
+      this.profileName = this.profile.nome
+    }else{
+      update = true
+    }
+
+    if(this.profileDescription == ''){
+      this.profileDescription = this.profile.description
+    }else{
+      update = true
+    }
+    
+    if(update){
+      let data = {
+        profile_id: this.profile_id,
+        name: this.profileName,
+        description: this.profileDescription,
+      }
+      this.http.put(`${this.apiUrl}users`, data).subscribe(
+        (res) => {
+          const array = Object.entries(res).map(([chave, valor]) => valor);
+          this.showLoading(array[1])
+          setTimeout(() => {
+            this.router.navigate(['/folder/home']);
+          }, 4000);
+        },
+        (err) => {
+          this.erro = true
+          if (err.status == 404) {
+            console.log(err);
+          }
+        }
+      );
+    }else{
+      let message = 'Não foram realizadas mudanças!'
+      this.showLoading(message)
+    }
+  }
+  deleteProfile(id: any){
+    this.http
+      .delete(`${this.apiUrl}profile/${this.profile_id}/${id}`)
+      .subscribe(
+        async (res) => {
+          let data = res;
+          const array = Object.entries(res).map(([chave, valor]) => valor);
+          await this.showLoading(array[1])
+        },
+        async (err) => {
+          this.erro = true;
+          await this.showLoading(err.error.message)
+          if (err.status == 404) {
+            console.log(err);
+          }
+        }
+      );
+  }
+
   getUsers() {
     let dataGrid: any = [];
     let data = {
@@ -175,13 +335,15 @@ export class FolderPage implements OnInit {
       },
       (err) => {
         this.erro = true
+        console.log("error")
+        this.showLoading(err.error)
         if (err.status == 404) {
           console.log(err);
         }
       }
     );
   }
-  updateProfile() {
+  updateUser() {
     let update = false;
     if(this.nomeUsuario == ''){
       this.nomeUsuario = this.user.nome
@@ -190,7 +352,7 @@ export class FolderPage implements OnInit {
     }
 
     if(this.emailUsuario == ''){
-      this.emailUsuario = this.user.nome
+      this.emailUsuario = this.user.email
     }else{
       update = true
     }
@@ -225,7 +387,6 @@ export class FolderPage implements OnInit {
     }
   }
   updateProfileUser(id: any, event: any) {
-    console.log('update Profile User:'+id+" - " + event);
     let data = {
       profile_id: this.profile_id,
       token: this.token,
@@ -237,9 +398,6 @@ export class FolderPage implements OnInit {
         const array = Object.entries(res).map(([chave, valor]) => valor);
         this.showLoading(array[1])
         this.getProfiles()
-        setTimeout(() => {
-          this.router.navigate(['/folder/home']);
-        }, 4000);
       },
       (err) => {
         this.erro = true
@@ -250,12 +408,6 @@ export class FolderPage implements OnInit {
     );
   }
   deleteUser(id: any){
-    let data = {
-      delete_user_id: id,
-      token: this.token,
-      user_id: this.user_id,
-      profile_id: this.profile_id
-    }
     this.http
       .delete(`${this.apiUrl}users/${this.profile_id}/${id}`)
       .subscribe(
@@ -281,5 +433,6 @@ export class FolderPage implements OnInit {
 
     loading.present();
   }
+
   
 }
