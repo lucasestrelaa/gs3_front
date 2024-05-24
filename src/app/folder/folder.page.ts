@@ -14,6 +14,7 @@ export class FolderPage implements OnInit {
 
   public nomeUsuario: string = '';
   public emailUsuario: string = '';
+  public passwordUsuario: string = '';
   private activatedRoute = inject(ActivatedRoute);
   users: any;
   user = {
@@ -33,7 +34,8 @@ export class FolderPage implements OnInit {
   token = sessionStorage.getItem('token')
 
   constructor(
-    public router: Router, public http: HttpClient,
+    public router: Router, 
+    public http: HttpClient,
     private loadingCtrl: LoadingController
     ) {
       
@@ -60,6 +62,18 @@ export class FolderPage implements OnInit {
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
       this.getProfiles();
+  }
+
+  submit(){
+    //rota = perfil
+    if(this.router.url === '/folder/perfil'){
+      this.updateProfile()
+      console.log('rota de perfil')
+    }else{
+      //rota = newUser
+      this.newUser()
+      console.log('rota de user')
+    }
   }
 
   getProfiles() {
@@ -143,6 +157,35 @@ export class FolderPage implements OnInit {
         }
       );
   }
+  newUser(){
+    let data = {
+      token: this.token,
+      user_id: this.user_id,
+      profile_id: this.profile_id,
+      name: this.nomeUsuario,
+      email: this.emailUsuario,
+      password: this.passwordUsuario
+    }
+    console.log(data)
+    this.http.post(`${this.apiUrl}users`, data).subscribe(
+      (res) => {
+
+        const array = Object.entries(res).map(([chave, valor]) => valor);
+        console.log(array)
+        this.showLoading(array[1])
+        this.getProfiles()
+        setTimeout(() => {
+          this.router.navigate(['/folder/administracao']);
+        }, 4000);
+      },
+      (err) => {
+        this.erro = true
+        if (err.status == 404) {
+          console.log(err);
+        }
+      }
+    );
+  }
 
   updateProfile() {
     console.log(this.nomeUsuario + " - "+ this.emailUsuario)
@@ -193,7 +236,7 @@ export class FolderPage implements OnInit {
   async showLoading(message: any) {
     const loading = await this.loadingCtrl.create({
       message: message,
-      duration: 3000,
+      duration: 4000,
     });
 
     loading.present();

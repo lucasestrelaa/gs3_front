@@ -48,13 +48,14 @@
           <strong class="capitalize">Informações sobre a GS3</strong>
         </div>
       </div>
-      <ion-list *ngIf="router.url === '/folder/perfil'">
+
+      <ion-list *ngIf="router.url === '/folder/perfil' || router.url === '/folder/newUser'">
           <ion-list>
             <ion-item>
               <ion-input
                 label="Nome"
                 placeholder="Digite seu nome"
-                value="{{user.nome}}"
+                value="{{ router.url === '/folder/perfil' ? user.nome : '' }}"
                 [(ngModel)] = "nomeUsuario"
               >
               </ion-input>
@@ -63,13 +64,21 @@
               <ion-input
                 label="E-mail"
                 type="email"
-                value="{{user.email}}"
+                value="{{ router.url === '/folder/perfil' ? user.email : '' }}"
                 placeholder="email@domain.com"
                 [(ngModel)] = "emailUsuario"
               ></ion-input>
             </ion-item>
+            <ion-item *ngIf="router.url === '/folder/newUser'">
+              <ion-input
+                label="Senha"
+                type="password"
+                placeholder="Senha"
+                [(ngModel)] = "passwordUsuario"
+              ></ion-input>
+            </ion-item>
             <ion-item>
-              <ion-button (click)="updateProfile()">Enviar</ion-button>
+              <ion-button (click)="submit()">Enviar</ion-button>
             </ion-item>
           </ion-list>
       </ion-list>
@@ -113,10 +122,12 @@
         </ion-list>
         <ion-fab horizontal="end" vertical="bottom" slot="fixed">
           <ion-fab-button>
-            <ion-icon name="add"></ion-icon>
+            <ion-icon name="add" [routerLink]="['/folder/newUser']"></ion-icon>
           </ion-fab-button>
         </ion-fab>
       </div>
+
+      
     </ion-content>
   </ion-split-pane>
 </ion-app>
