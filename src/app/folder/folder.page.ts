@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-folder',
@@ -28,9 +29,15 @@ export class FolderPage implements OnInit {
   'https://desafiogs3.addictiontech.com.br/public/api/';
   private erro = false;
   private profile_id = sessionStorage.getItem('profile_id');
-  
+  user_id = sessionStorage.getItem('user_id')
+  token = sessionStorage.getItem('token')
 
-  constructor(public router: Router, public http: HttpClient) {}
+  constructor(
+    public router: Router, public http: HttpClient,
+    private loadingCtrl: LoadingController
+    ) {
+      
+    }
 
   public appPages = [
     { title: 'Home', url: '/folder/home', icon: 'home', permission: true },
@@ -112,11 +119,9 @@ export class FolderPage implements OnInit {
   }
   getUser() {
     let dataGrid: any = [];
-    let user_id = sessionStorage.getItem('user_id')
-    let token = sessionStorage.getItem('token')
 
     this.http
-      .get(`${this.apiUrl}user/${token}/${user_id}`)
+      .get(`${this.apiUrl}user/${this.token}/${this.user_id}`)
       .subscribe(
         (res) => {
           let data = res;
@@ -157,4 +162,41 @@ export class FolderPage implements OnInit {
     //se o valor for igual ao original, não fazer nada
     //diferente, atualiza usuário e redireciona para folder/administrador
   }
+
+  deleteUser(id: any){
+    let data = {
+      delete_user_id: id,
+      token: this.token,
+      user_id: this.user_id,
+      profile_id: this.profile_id
+    }
+    console.log('deletou o usuário '+id)
+    this.http
+      .delete(`${this.apiUrl}users`)
+      .subscribe(
+        async (res) => {
+          let data = res;
+          const array = Object.entries(res).map(([chave, valor]) => valor);
+          console.log(array)
+          console.log(data)
+          await this.showLoading(array[0].message)
+        },
+        async (err) => {
+          this.erro = true;
+          await this.showLoading(err.error.message)
+          if (err.status == 404) {
+            console.log(err);
+          }
+        }
+      );
+  }
+  async showLoading(message: any) {
+    const loading = await this.loadingCtrl.create({
+      message: message,
+      duration: 3000,
+    });
+
+    loading.present();
+  }
+  
 }
