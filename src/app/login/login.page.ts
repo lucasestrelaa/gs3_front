@@ -18,9 +18,6 @@ export class LoginPage implements OnInit {
   constructor(private router: Router, public http: HttpClient) {}
 
   ngOnInit() {
-    console.log(this.url)
-    console.log(this.apiUrl);
-    
   }
   autenticacao = false;
   erro = false
@@ -47,11 +44,5 @@ export class LoginPage implements OnInit {
         }
       }
     );
-  }
-  cadastrar() {
-
-  }
-  logout() {
-
   }
 }

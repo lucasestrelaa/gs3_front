@@ -12,30 +12,30 @@ import { LoadingController } from '@ionic/angular';
 export class FolderPage implements OnInit {
   public folder!: string;
 
-  public nomeUsuario: string = ''
-  public emailUsuario: string = ''
-  public profileName: string = ''
-  public profileDescription: string = ''
-  public passwordUsuario: string = ''
+  public name: string = ''
+  public emailUser: string = ''
+  public descriptionProfile: string = ''
+  public passwordUser: string = ''
   private activatedRoute = inject(ActivatedRoute)
   users: any;
   user = {
     id: 0,
-    nome: '',
+    name: '',
     email: '',
     profile_id: 0,
     profile_name: ''
   };
   profile = {
     id: 0,
-    nome: '',
+    name: '',
     description: ''
   };
   profiles: any;
+  data: any;
   url = window.location.hostname
   private apiUrl: string = this.url.includes('localhost') ? 'http://localhost:8000/api/' :
   'https://desafiogs3.addictiontech.com.br/public/api/'
-  private erro = false;
+  titlePage = ''
   private profile_id = sessionStorage.getItem('profile_id')
   user_id = sessionStorage.getItem('user_id')
   token = sessionStorage.getItem('token')
@@ -52,7 +52,7 @@ export class FolderPage implements OnInit {
     { title: 'Home', url: '/folder/home', icon: 'home', permission: true },
     {
       title: 'Perfil',
-      url: '/folder/perfil',
+      url: '/folder/profileUser',
       icon: 'person',
       permission: true,
     },
@@ -69,18 +69,41 @@ export class FolderPage implements OnInit {
       permission: false,
     },
     {
-      title: 'perfis',
+      title: 'Perfis',
       url: '/folder/profiles',
-      icon: 'build',
+      icon: 'people',
       permission: this.profile_id == '1' ? true : false,
     },
+    {
+      title: 'Perfis',
+      url: '/folder/profile/:id',
+      icon: 'build',
+      permission: false,
+    },
+    {
+      title: 'Novo Perfil',
+      url: '/folder/newProfile',
+      icon: 'build',
+      permission: false,
+    },
+    
   ];
 
   public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders']
 
   ngOnInit() {
     this.folder = this.activatedRoute.snapshot.paramMap.get('id') as string;
+    var numsStr = this.folder.replace(/[^0-9]/g,'') ? parseInt(this.folder.replace(/[^0-9]/g,'')) : '';
+    this.appPages.map((res: any) => {if(res.url.includes(this.folder)){ this.titlePage = res.title }})
+    if(numsStr != ''){
+      this.getProfile(this.folder)
+      let routerPart = this.router.url.split('/')
+      this.folder = routerPart[routerPart.length - 2]
+    }else{
+      
       this.getProfiles();
+    }
+    
       /*
         implementação futura - 
         pegar hora do session e comparar com a hora atual, 
@@ -92,18 +115,31 @@ export class FolderPage implements OnInit {
     //rota = perfil
     if(this.router.url === '/folder/perfil'){
       this.updateUser()
-      console.log('rota de perfil')
-    }else{
+    }else if(this.router.url === '/folder/newUser'){
       //rota = newUser
       if(
-        this.nomeUsuario == "" || 
-        this.emailUsuario == "" ||
-        this.passwordUsuario == ""
+        this.name == "" || 
+        this.emailUser == "" ||
+        this.passwordUser == ""
       ){
         this.showLoading("Confira os campos e tente novamente!")
       }else{
         this.newUser()
       }
+    }else if(this.router.url.includes('/folder/profileUser')){
+      this.updateUser()
+    }
+    else if(this.router.url.includes('/folder/newProfile')){
+      if(
+        this.name == "" || 
+        this.descriptionProfile == ""
+      ){
+        this.showLoading("Confira os campos e tente novamente!")
+      }else{
+        this.newProfile()
+      }
+    }else if(this.router.url.includes('/folder/profile/')){
+      this.updateProfile()
     }
   }
   logout(){
@@ -114,24 +150,24 @@ export class FolderPage implements OnInit {
       (res) => {
         const array = Object.entries(res).map(([chave, valor]) => valor);
         this.showLoading(array[1])
+        sessionStorage.clear()
         setTimeout(() => {
           this.router.navigate(['/']);
         }, 4000);
       },
       (err) => {
-        this.erro = true
+        
         if (err.status == 404) {
           console.log(err);
         }
       }
     );
-    //sessionStorage.clear()
-    //console.log('usuário deslogado!')
   }
   getProfiles() {
     this.http.get(`${this.apiUrl}profile`, { responseType: 'text' }).subscribe(
       (res) => {
         let data = JSON.parse(res);
+
         this.profiles = data.dados;
         if (this.folder === 'administracao') {
           this.getUsers();
@@ -141,8 +177,7 @@ export class FolderPage implements OnInit {
         }
       },
       (err) => {
-        this.erro = true;
-        console.log(err);
+        ;
         if (err.status == 404) {
           console.log(err);
         }
@@ -150,19 +185,16 @@ export class FolderPage implements OnInit {
     );
   }
   getProfile(profile_select_id: any){
-    let dataGrid: any = [];
+    // como já possui o array de serviços, vou buscar aqui, sem precisar fazer requisição
     this.http
       .get(`${this.apiUrl}profile/${this.token}/${profile_select_id}`)
       .subscribe(
         (res) => {
-          let data = res;
           const array = Object.entries(res).map(([chave, valor]) => valor);
-          
           this.profile = array[1]
         },
         (err) => {
-          this.erro = true;
-          console.log(err);
+          ;
           if (err.status == 404) {
             console.log(err);
           }
@@ -173,22 +205,21 @@ export class FolderPage implements OnInit {
     let data = {
       token: this.token,
       user_id: this.user_id,
-      name: this.profileName,
-      description: this.profileDescription,
+      profile_id: this.profile_id,
+      name: this.name,
+      description: this.descriptionProfile,
     }
-    console.log(data)
     this.http.post(`${this.apiUrl}profile`, data).subscribe(
       (res) => {
         const array = Object.entries(res).map(([chave, valor]) => valor);
         this.showLoading(array[1])
         this.getProfiles()
         setTimeout(() => {
-          this.router.navigate(['/folder/administracao']);
+          this.router.navigate(['/folder/home']);
         }, 4000);
       },
       (err) => {
-        this.erro = true
-        console.log("error")
+        
         this.showLoading(err.error)
         if (err.status == 404) {
           console.log(err);
@@ -198,34 +229,34 @@ export class FolderPage implements OnInit {
   }
   updateProfile(){
     let update = false;
-    if(this.profileName == ''){
-      this.profileName = this.profile.nome
+    if(this.name == ''){
+      this.name = this.profile.name
     }else{
       update = true
     }
 
-    if(this.profileDescription == ''){
-      this.profileDescription = this.profile.description
+    if(this.descriptionProfile == ''){
+      this.descriptionProfile = this.profile.description
     }else{
       update = true
     }
     
     if(update){
       let data = {
-        profile_id: this.profile_id,
-        name: this.profileName,
-        description: this.profileDescription,
+        profile_id: this.profile.id,
+        name: this.name,
+        description: this.descriptionProfile,
       }
-      this.http.put(`${this.apiUrl}users`, data).subscribe(
+      this.http.put(`${this.apiUrl}profile`, data).subscribe(
         (res) => {
           const array = Object.entries(res).map(([chave, valor]) => valor);
           this.showLoading(array[1])
           setTimeout(() => {
-            this.router.navigate(['/folder/home']);
+            this.router.navigate(['/folder/profiles']);
           }, 4000);
         },
         (err) => {
-          this.erro = true
+          
           if (err.status == 404) {
             console.log(err);
           }
@@ -246,7 +277,7 @@ export class FolderPage implements OnInit {
           await this.showLoading(array[1])
         },
         async (err) => {
-          this.erro = true;
+          ;
           await this.showLoading(err.error.message)
           if (err.status == 404) {
             console.log(err);
@@ -280,8 +311,7 @@ export class FolderPage implements OnInit {
           }
         },
         (err) => {
-          this.erro = true;
-          console.log(err);
+          ;
           if (err.status == 404) {
             console.log(err);
           }
@@ -306,8 +336,7 @@ export class FolderPage implements OnInit {
           }
         },
         (err) => {
-          this.erro = true;
-          console.log(err);
+          ;
           if (err.status == 404) {
             console.log(err);
           }
@@ -319,11 +348,10 @@ export class FolderPage implements OnInit {
       token: this.token,
       user_id: this.user_id,
       profile_id: this.profile_id,
-      name: this.nomeUsuario,
-      email: this.emailUsuario,
-      password: this.passwordUsuario
+      name: this.name,
+      email: this.emailUser,
+      password: this.passwordUser
     }
-    console.log(data)
     this.http.post(`${this.apiUrl}users`, data).subscribe(
       (res) => {
         const array = Object.entries(res).map(([chave, valor]) => valor);
@@ -334,8 +362,7 @@ export class FolderPage implements OnInit {
         }, 4000);
       },
       (err) => {
-        this.erro = true
-        console.log("error")
+        
         this.showLoading(err.error)
         if (err.status == 404) {
           console.log(err);
@@ -345,14 +372,14 @@ export class FolderPage implements OnInit {
   }
   updateUser() {
     let update = false;
-    if(this.nomeUsuario == ''){
-      this.nomeUsuario = this.user.nome
+    if(this.name == ''){
+      this.name = this.user.name
     }else{
       update = true
     }
 
-    if(this.emailUsuario == ''){
-      this.emailUsuario = this.user.email
+    if(this.emailUser == ''){
+      this.emailUser = this.user.email
     }else{
       update = true
     }
@@ -362,8 +389,8 @@ export class FolderPage implements OnInit {
         token: this.token,
         user_id: this.user_id,
         profile_id: this.profile_id,
-        name: this.nomeUsuario,
-        email: this.emailUsuario,
+        name: this.name,
+        email: this.emailUser,
       }
       this.http.put(`${this.apiUrl}users`, data).subscribe(
         (res) => {
@@ -371,11 +398,11 @@ export class FolderPage implements OnInit {
           this.showLoading(array[1])
           this.getProfiles()
           setTimeout(() => {
-            this.router.navigate(['/folder/home']);
+            this.router.navigate(['/folder/administracao']);
           }, 4000);
         },
         (err) => {
-          this.erro = true
+          
           if (err.status == 404) {
             console.log(err);
           }
@@ -400,7 +427,7 @@ export class FolderPage implements OnInit {
         this.getProfiles()
       },
       (err) => {
-        this.erro = true
+        
         if (err.status == 404) {
           console.log(err);
         }
@@ -417,7 +444,7 @@ export class FolderPage implements OnInit {
           await this.showLoading(array[1])
         },
         async (err) => {
-          this.erro = true;
+          ;
           await this.showLoading(err.error.message)
           if (err.status == 404) {
             console.log(err);

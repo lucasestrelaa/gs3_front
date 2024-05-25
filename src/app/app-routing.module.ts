@@ -16,8 +16,8 @@ const routes: Routes = [
     loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
   },
   {
-    path: 'profile',
-    loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
+    path: 'folder/profile/:id',
+    loadChildren: () => import('./folder/folder.module').then( m => m.FolderPageModule)
   }
 ];
 
