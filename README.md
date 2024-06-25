@@ -4,5 +4,5 @@
 
 <p>Para utilizar
 <hr>
-  <b>Login:</b>lucas@teste.com
+  <b>Login:</b>lucas@teste.com<br>
   <b>Senha:</b>123456</p>
